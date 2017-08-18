@@ -5,13 +5,13 @@ import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.util.TestConfiguration
 
-class Fuel {
-    interface PathStringConvertible {
-        val path: String
+impl class Fuel {
+    impl interface PathStringConvertible {
+        impl val path: String
     }
 
-    interface RequestConvertible {
-        val request: Request
+    impl interface RequestConvertible {
+        impl val request: Request
     }
 
     companion object {

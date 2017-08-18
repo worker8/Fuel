@@ -1,13 +1,11 @@
 package com.github.kittinunf.fuel.core
 
-import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.deserializers.ByteArrayDeserializer
 import com.github.kittinunf.fuel.core.deserializers.StringDeserializer
+import com.github.kittinunf.fuel.core.internal.BaseRequest
 import com.github.kittinunf.fuel.core.requests.DownloadTaskRequest
 import com.github.kittinunf.fuel.core.requests.TaskRequest
 import com.github.kittinunf.fuel.core.requests.UploadTaskRequest
-import com.github.kittinunf.fuel.util.Base64
-import com.github.kittinunf.result.Result
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.OutputStream
@@ -19,25 +17,10 @@ import java.util.concurrent.Future
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLSocketFactory
 
-class Request : Fuel.RequestConvertible {
-
-    enum class Type {
-        REQUEST,
-        DOWNLOAD,
-        UPLOAD
-    }
-
-    var timeoutInMillisecond = 15000
-    var timeoutReadInMillisecond = timeoutInMillisecond
-
-    var type: Type = Type.REQUEST
-    lateinit var httpMethod: Method
-    lateinit var path: String
-    lateinit var url: Url
-
+impl class Request : BaseRequest() {
     //body
     var bodyCallback: ((Request, OutputStream?, Long) -> Long)? = null
-    val httpBody: ByteArray
+    impl override val httpBody: ByteArray
         get() {
             return ByteArrayOutputStream().apply {
                 bodyCallback?.invoke(request, this, 0)
@@ -46,22 +29,11 @@ class Request : Fuel.RequestConvertible {
 
     lateinit var client: Client
 
-    //headers
-    val httpHeaders = mutableMapOf<String, String>()
-
-    //params
-    var parameters = listOf<Pair<String, Any?>>()
-
-    var name = ""
-
-    val names = mutableListOf<String>()
-    val mediaTypes = mutableListOf<String>()
-
     //underlying task request
     val taskRequest: TaskRequest by lazy {
         when (type) {
-            Type.DOWNLOAD -> DownloadTaskRequest(this)
-            Type.UPLOAD -> UploadTaskRequest(this)
+            RequestType.DOWNLOAD -> DownloadTaskRequest(this)
+            RequestType.UPLOAD -> UploadTaskRequest(this)
             else -> TaskRequest(this)
         }
     }
@@ -76,42 +48,6 @@ class Request : Fuel.RequestConvertible {
     lateinit var executor: ExecutorService
     lateinit var callbackExecutor: Executor
 
-    //interceptor
-    var requestInterceptor: ((Request) -> Request)? = null
-    var responseInterceptor: ((Request, Response) -> Response)? = null
-
-    //interfaces
-    fun timeout(timeout: Int): Request {
-        timeoutInMillisecond = timeout
-        return this
-    }
-
-    fun timeoutRead(timeout: Int): Request {
-        timeoutReadInMillisecond = timeout
-        return this
-    }
-
-    fun header(vararg pairs: Pair<String, Any>?): Request {
-        pairs.forEach {
-            if (it != null)
-                httpHeaders.plusAssign(Pair(it.first, it.second.toString()))
-        }
-        return this
-    }
-
-    fun header(pairs: Map<String, Any>?): Request = header(pairs, true)
-
-    internal fun header(pairs: Map<String, Any>?, replace: Boolean): Request {
-        pairs?.forEach {
-            it.let {
-                if (!httpHeaders.containsKey(it.key) || replace) {
-                    httpHeaders.plusAssign(Pair(it.key, it.value.toString()))
-                }
-            }
-        }
-        return this
-    }
-
     fun body(body: ByteArray): Request {
         bodyCallback = { request, outputStream, totalLength ->
             outputStream?.write(body)
@@ -122,11 +58,6 @@ class Request : Fuel.RequestConvertible {
 
     fun body(body: String, charset: Charset = Charsets.UTF_8): Request = body(body.toByteArray(charset))
 
-    fun authenticate(username: String, password: String): Request {
-        val auth = "$username:$password"
-        val encodedAuth = Base64.encode(auth.toByteArray())
-        return header("Authorization" to "Basic " + String(encodedAuth))
-    }
 
     fun progress(handler: (readBytes: Long, totalBytes: Long) -> Unit): Request {
         if (taskRequest as? DownloadTaskRequest != null) {
@@ -225,45 +156,6 @@ class Request : Fuel.RequestConvertible {
     override val request: Request
         get() = this
 
-    fun cUrlString(): String {
-        val elements = mutableListOf("$ curl -i")
-
-        //method
-        if (httpMethod != Method.GET) {
-            elements.add("-X $httpMethod")
-        }
-
-        //body
-        val escapedBody = String(httpBody).replace("\"", "\\\"")
-        if (escapedBody.isNotEmpty()) {
-            elements.add("-d \"$escapedBody\"")
-        }
-
-        //headers
-        for ((key, value) in httpHeaders) {
-            elements.add("-H \"$key:$value\"")
-        }
-
-        //url
-        elements.add("\"$url\"")
-
-        return elements.joinToString(" ")
-    }
-
-    override fun toString(): String {
-        val elements = mutableListOf("--> $httpMethod ($url)")
-
-        //body
-        elements.add("Body : ${if (httpBody.isNotEmpty()) String(httpBody) else "(empty)"}")
-
-        //headers
-        elements.add("Headers : (${httpHeaders.size})")
-        for ((key, value) in httpHeaders) {
-            elements.add("$key : $value")
-        }
-
-        return elements.joinToString("\n")
-    }
 
     //byte array
     fun response(handler: (Request, Response, Result<ByteArray, FuelError>) -> Unit) =

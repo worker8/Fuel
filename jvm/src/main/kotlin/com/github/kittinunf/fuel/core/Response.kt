@@ -1,5 +1,6 @@
 package com.github.kittinunf.fuel.core
 
+import com.github.kittinunf.fuel.core.internal.BaseResponse
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream

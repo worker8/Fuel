@@ -11,7 +11,7 @@ import kotlin.properties.Delegates
 
 class Encoding : Fuel.RequestConvertible {
 
-    var requestType: Request.Type = Request.Type.REQUEST
+    var requestType: RequestType = RequestType.REQUEST
     var httpMethod: Method by Delegates.notNull()
     var baseUrlString: String? = null
     var urlString: String by Delegates.notNull()
@@ -30,7 +30,7 @@ class Encoding : Fuel.RequestConvertible {
                 }
             }
             modifiedPath += (querySign + queryParamString)
-        } else if (requestType == Request.Type.UPLOAD) {
+        } else if (requestType == RequestType.UPLOAD) {
             val boundary = System.currentTimeMillis().toHexString()
             headerPairs += "Content-Type" to "multipart/form-data; boundary=" + boundary
         } else {

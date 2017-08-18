@@ -90,7 +90,7 @@ class FuelManager {
             baseUrlString = basePath
             urlString = path
             parameters = if (param == null) baseParams else baseParams + param
-            requestType = Request.Type.DOWNLOAD
+            requestType = RequestType.DOWNLOAD
         }.request
 
         request.client = client
@@ -110,7 +110,7 @@ class FuelManager {
             baseUrlString = basePath
             urlString = path
             parameters = if (param == null) baseParams else baseParams + param
-            requestType = Request.Type.UPLOAD
+            requestType = RequestType.UPLOAD
         }.request
 
         request.client = client

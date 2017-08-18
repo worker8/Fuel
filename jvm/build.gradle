@@ -16,9 +16,7 @@ dependencies {
     implement project(':common')
     // TODO find why it doesn't inherit the dependencies
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile ("com.github.kittinunf.result:result:$result_version") {
-        transitive = false
-    }
+    compile "com.github.kittinunf.result:result:$result_version"
 
     testCompile "junit:junit:$parent.ext.junit_version"
 }

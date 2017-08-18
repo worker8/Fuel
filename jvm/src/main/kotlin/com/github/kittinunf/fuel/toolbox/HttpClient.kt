@@ -1,11 +1,7 @@
 package com.github.kittinunf.fuel.toolbox
 
 import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.core.Client
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Method
-import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.*
 import java.io.BufferedOutputStream
 import java.io.ByteArrayInputStream
 import java.io.IOException
@@ -96,7 +92,7 @@ class HttpClient(val proxy: Proxy? = null) : Client {
         if (bodyCallback != null && connection.doOutput) {
             val contentLength = bodyCallback.invoke(request, null, 0)
 
-            if (request.type == Request.Type.UPLOAD)
+            if (request.type == RequestType.UPLOAD)
                 connection.setFixedLengthStreamingMode(contentLength.toInt())
 
             val outStream = BufferedOutputStream(connection.outputStream)

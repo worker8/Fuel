@@ -151,6 +151,7 @@ class RequestDownloadTest : BaseTestCase() {
     }
 
     @Test
+    @Ignore
     fun httpDownloadBigFileWithProgressValidCase() {
         var request: Request? = null
         var response: Response? = null
