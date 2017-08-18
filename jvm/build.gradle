@@ -1,0 +1,55 @@
+apply plugin: 'kotlin-platform-jvm'
+
+apply plugin: 'com.novoda.bintray-release'
+
+apply plugin: 'jacoco'
+
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
+    test.java.srcDirs += 'src/test/kotlin'
+}
+
+sourceCompatibility = JavaVersion.VERSION_1_6
+targetCompatibility = JavaVersion.VERSION_1_6
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    implement project(':common')
+    // TODO find why it doesn't inherit the dependencies
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$parent.ext.kotlin_version"
+    compile "com.github.kittinunf.result:result:$parent.ext.result_version"
+
+    testCompile "junit:junit:$parent.ext.junit_version"
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$parent.ext.kotlin_version"
+    }
+}
+
+jacocoTestReport {
+    reports {
+        html.enabled = false
+        xml.enabled = true
+        csv.enabled = false
+    }
+}
+
+publish {
+    artifactId = 'fuel'
+    autoPublish = true
+    desc = 'The easiest HTTP networking library in Kotlin/Android'
+    groupId = 'com.github.kittinunf.fuel'
+    licences = ['MIT']
+    publishVersion = parent.ext.publish_version
+    uploadName = 'Fuel-Android'
+    website = 'https://github.com/kittinunf/Fuel'
+}
