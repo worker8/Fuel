@@ -125,7 +125,7 @@ class Request : Fuel.RequestConvertible {
 
     fun authenticate(username: String, password: String): Request {
         val auth = "$username:$password"
-        val encodedAuth = Base64.encode(auth.toByteArray(), Base64.NO_WRAP)
+        val encodedAuth = Base64.encode(auth.toByteArray())
         return header("Authorization" to "Basic " + String(encodedAuth))
     }
 
