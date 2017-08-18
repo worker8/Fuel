@@ -2,7 +2,6 @@ package com.github.kittinunf.fuel.core.interceptors
 
 import com.github.kittinunf.fuel.core.*
 import java.net.MalformedURLException
-import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 
 class RedirectException : Exception("Redirection fail, not found URL to redirect to")
@@ -20,10 +19,10 @@ fun redirectResponseInterceptor(manager: FuelManager) =
                             httpMethod = request.httpMethod
                             urlString =
                             try {
-                                URL(redirectedUrl[0]).toString()
+                                Url(redirectedUrl[0]).toString()
                             } catch (e: MalformedURLException){
                                 // Maybe its a relative url. Use the original for context.
-                                URL(request.url, redirectedUrl[0]).toString()
+                                Url(request.url, redirectedUrl[0]).toString()
                             }
                         }
                         manager.request(encoding).response().second

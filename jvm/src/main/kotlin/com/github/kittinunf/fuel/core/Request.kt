@@ -11,7 +11,6 @@ import com.github.kittinunf.result.Result
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.OutputStream
-import java.net.URL
 import java.nio.charset.Charset
 import java.util.concurrent.Callable
 import java.util.concurrent.Executor
@@ -34,7 +33,7 @@ class Request : Fuel.RequestConvertible {
     var type: Type = Type.REQUEST
     lateinit var httpMethod: Method
     lateinit var path: String
-    lateinit var url: URL
+    lateinit var url: Url
 
     //body
     var bodyCallback: ((Request, OutputStream?, Long) -> Long)? = null
@@ -147,7 +146,7 @@ class Request : Fuel.RequestConvertible {
         return this
     }
 
-    fun dataParts(dataParts: (Request, URL) -> Iterable<DataPart>): Request {
+    fun dataParts(dataParts: (Request, Url) -> Iterable<DataPart>): Request {
         val uploadTaskRequest = taskRequest as? UploadTaskRequest ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
         val parts = dataParts.invoke(request, request.url)
 
@@ -168,7 +167,7 @@ class Request : Fuel.RequestConvertible {
         return this
     }
 
-    fun sources(sources: (Request, URL) -> Iterable<File>): Request {
+    fun sources(sources: (Request, Url) -> Iterable<File>): Request {
         mediaTypes.clear()
         names.clear()
 
@@ -180,7 +179,7 @@ class Request : Fuel.RequestConvertible {
         return this
     }
 
-    fun source(source: (Request, URL) -> File): Request {
+    fun source(source: (Request, Url) -> File): Request {
         sources { request, _ ->
             listOf(source.invoke(request, request.url))
         }
@@ -193,7 +192,7 @@ class Request : Fuel.RequestConvertible {
         return this
     }
 
-    fun destination(destination: (Response, URL) -> File): Request {
+    fun destination(destination: (Response, Url) -> File): Request {
         val downloadTaskRequest = taskRequest as? DownloadTaskRequest ?: throw IllegalStateException("destination is only used with RequestType.DOWNLOAD")
 
         downloadTaskRequest.apply {

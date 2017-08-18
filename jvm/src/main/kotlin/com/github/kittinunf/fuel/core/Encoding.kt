@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.util.toHexString
+import com.sun.jndi.toolkit.url.Uri
 import java.net.MalformedURLException
 import java.net.URI
 import java.net.URISyntaxException
@@ -50,7 +51,7 @@ class Encoding : Fuel.RequestConvertible {
 
     override val request by lazy { encoder(httpMethod, urlString, parameters) }
 
-    private fun createUrl(path: String): URL {
+    private fun createUrl(path: String): Url {
         val url = try {
             //give precedence to local path
             URL(path)
@@ -62,7 +63,7 @@ class Encoding : Fuel.RequestConvertible {
         } catch (e: URISyntaxException) {
             URI(url.protocol, url.userInfo, url.host, url.port, url.path, url.query, url.ref)
         }
-        return URL(uri.toASCIIString())
+        return Url(URL(uri.toASCIIString()))
     }
 
     private fun encodeParameterInUrl(method: Method): Boolean {

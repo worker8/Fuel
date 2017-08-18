@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel.core.requests
 
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.Url
 import com.github.kittinunf.fuel.util.copyTo
 import com.github.kittinunf.fuel.util.toHexString
 import java.io.ByteArrayOutputStream
@@ -74,7 +75,7 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
     val boundary = request.httpHeaders["Content-Type"]?.split("=", limit = 2)?.get(1) ?: System.currentTimeMillis().toHexString()
 
     var progressCallback: ((Long, Long) -> Unit)? = null
-    lateinit var sourceCallback: (Request, URL) -> Iterable<File>
+    lateinit var sourceCallback: (Request, Url) -> Iterable<File>
 
     init{
         request.bodyCallback = bodyCallBack

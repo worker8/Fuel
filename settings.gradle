@@ -1,7 +1,9 @@
-include ':fuel',
-        ':fuel-gson',
-        ':fuel-livedata',
-        ':fuel-rxjava',
-        ':fuel-android',
-        ':sample',
-        ':sample-java'
+include ':common',
+        ':jvm'
+//        ':fuel-gson',
+//        ':fuel-livedata',
+//        ':fuel-rxjava',
+//        ':fuel-android',
+//        ':sample',
+//        ':sample-java'
+

@@ -79,7 +79,7 @@ class HttpClient(val proxy: Proxy? = null) : Client {
     }
 
     private fun establishConnection(request: Request): URLConnection {
-        val urlConnection = if (proxy != null) request.url.openConnection(proxy) else request.url.openConnection()
+        val urlConnection = if (proxy != null) request.url.toURL().openConnection(proxy) else request.url.toURL().openConnection()
         return if (request.url.protocol == "https") {
             val conn = urlConnection as HttpsURLConnection
             conn.apply {

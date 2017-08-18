@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel.core.requests
 
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.Url
 import com.github.kittinunf.fuel.util.copyTo
 import java.io.ByteArrayInputStream
 import java.io.File
@@ -14,7 +15,7 @@ class DownloadTaskRequest(request: Request) : TaskRequest(request) {
     val BUFFER_SIZE = 1024
 
     var progressCallback: ((Long, Long) -> Unit)? = null
-    lateinit var destinationCallback: ((Response, URL) -> File)
+    lateinit var destinationCallback: ((Response, Url) -> File)
 
     lateinit var fileOutputStream: FileOutputStream
 
