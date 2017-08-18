@@ -7,13 +7,11 @@ sourceSets {
     test.java.srcDirs += 'src/test/kotlin'
 }
 
-repositories {
-    jcenter()
-}
-
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-common:$parent.ext.kotlin_version"
-    compile "com.github.kittinunf.result:result:$parent.ext.result_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
+    compile ("com.github.kittinunf.result:result:$result_version") {
+        transitive = false
+    }
 
     testCompile "junit:junit:$parent.ext.junit_version"
 }
@@ -21,10 +19,11 @@ dependencies {
 buildscript {
     repositories {
         jcenter()
+        maven { url "http://dl.bintray.com/kotlin/kotlin-eap-1.2" }
     }
 
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$parent.ext.kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 

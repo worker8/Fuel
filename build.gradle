@@ -1,5 +1,10 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.1'
+    distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
+}
+
 buildscript {
     repositories {
         jcenter()
@@ -21,8 +26,6 @@ allprojects {
         publish_version = '1.9.0'
 
         //dependencies version
-        kotlin_version = '1.1.4'
-        result_version = '1.1.0'
         rxjava_version = '2.1.0'
         archLifecycleVersion = "1.0.0-alpha3"
 
@@ -38,6 +41,7 @@ allprojects {
 
     repositories {
         jcenter()
+        maven { url "http://dl.bintray.com/kotlin/kotlin-eap-1.2" }
         maven { url "https://maven.google.com" }
     }
 }
