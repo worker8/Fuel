@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$parent.ext.kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-common:$parent.ext.kotlin_version"
     compile "com.github.kittinunf.result:result:$parent.ext.result_version"
 
     testCompile "junit:junit:$parent.ext.junit_version"
