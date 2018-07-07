@@ -24,26 +24,22 @@ import kotlinx.coroutines.experimental.launch
 import java.io.File
 import java.io.Reader
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(),MainActivityContract.View {
 
     private val TAG = MainActivity::class.java.simpleName
 
     private val bag by lazy { CompositeDisposable() }
 
+    lateinit var presenter : MainActivityContract.Presenter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        FuelManager.instance.apply {
-            basePath = "http://httpbin.org"
-            baseHeaders = mapOf("Device" to "Android")
-            baseParams = listOf("key" to "value")
-//            addResponseInterceptor { loggingResponseInterceptor() }
-        }
+        presenter = MainActivityPresenter().also { it.onStart(this) }
 
         mainGoCoroutineButton.setOnClickListener {
             launch(UI) {
-                executeCoroutine()
+                 presenter.httpGetCoroutine()
             }
         }
 
@@ -52,14 +48,19 @@ class MainActivity : AppCompatActivity() {
         }
 
         mainClearButton.setOnClickListener {
-            mainResultText.text = ""
-            mainAuxText.text = ""
+           presenter.resetText()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         bag.clear()
+        presenter.onFinish()
+    }
+
+    override fun clearText() {
+        mainResultText.text = ""
+        mainAuxText.text = ""
     }
 
     private fun execute() {
@@ -76,17 +77,6 @@ class MainActivity : AppCompatActivity() {
         httpCancel()
         httpRxSupport()
         httpLiveDataSupport()
-    }
-
-    private suspend fun executeCoroutine() {
-        httpGetCoroutine()
-    }
-
-    private suspend fun httpGetCoroutine() {
-        val (request, response, result) = Fuel.get("/get", listOf("userId" to "123")).awaitString()
-        Log.d(TAG, response.toString())
-        Log.d(TAG, request.toString())
-        update(result)
     }
 
     private fun httpCancel() {
@@ -252,7 +242,7 @@ class MainActivity : AppCompatActivity() {
                 }
     }
 
-    private fun <T : Any> update(result: Result<T, FuelError>) {
+    override fun <T : Any> update(result: Result<T, FuelError>) {
         result.fold(success = {
             mainResultText.append(it.toString())
         }, failure = {
