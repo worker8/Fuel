@@ -4,42 +4,36 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import awaitString
-import com.github.kittinunf.fuel.*
 import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.core.ResponseDeserializable
-import com.github.kittinunf.fuel.gson.responseObject
+import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.livedata.liveDataObject
-import com.github.kittinunf.fuel.rx.rx_object
 import com.github.kittinunf.result.Result
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
-import java.io.File
-import java.io.Reader
 
-class MainActivity : AppCompatActivity(),MainActivityContract.View {
+class MainActivity : AppCompatActivity(), MainActivityContract.View {
 
     private val TAG = MainActivity::class.java.simpleName
 
     private val bag by lazy { CompositeDisposable() }
 
-    lateinit var presenter : MainActivityContract.Presenter
+    private lateinit var networkRepository: NetworkRepository
+
+    lateinit var presenter: MainActivityContract.Presenter
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        presenter = MainActivityPresenter().also { it.onStart(this) }
+        networkRepository = FuelNetworkRepository(filesDir)
+
+        presenter = MainActivityPresenter(networkRepository).also { it.onStart(this) }
 
         mainGoCoroutineButton.setOnClickListener {
             launch(UI) {
-                 presenter.httpGetCoroutine()
+                presenter.httpGetCoroutine()
             }
         }
 
@@ -48,7 +42,7 @@ class MainActivity : AppCompatActivity(),MainActivityContract.View {
         }
 
         mainClearButton.setOnClickListener {
-           presenter.resetText()
+            presenter.resetText()
         }
     }
 
@@ -80,10 +74,8 @@ class MainActivity : AppCompatActivity(),MainActivityContract.View {
     }
 
     private fun httpCancel() {
-        val request = Fuel.get("/delay/10").interrupt {
-            Log.d(TAG, it.url.toString() + " is interrupted")
-        }.responseString { _, _, result ->
-            update(result)
+        val request = networkRepository.httpGetRequest()
+        request.responseString { _, _, _ ->
         }
 
         Handler().postDelayed({
@@ -92,145 +84,58 @@ class MainActivity : AppCompatActivity(),MainActivityContract.View {
     }
 
     private fun httpResponseObject() {
-        "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
-                .responseObject(Issue.Deserializer()) { request, _, result ->
-                    Log.d(TAG, request.toString())
-                    update(result)
-                }
+        networkRepository.httpResponseObject().update()
     }
 
 
     private fun httpListResponseObject() {
-        "https://api.github.com/repos/kittinunf/Fuel/issues".httpGet()
-                .responseObject(Issue.ListDeserializer()) { _, _, result ->
-                    update(result)
-                }
+        networkRepository.httpListResponseObject().update()
     }
 
     private fun httpGsonResponseObject() {
-        "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
-                .responseObject<Issue> { request, _, result ->
-                    Log.d(TAG, request.toString())
-                    update(result)
-                }
+        networkRepository.httpGsonResponseObject().update()
     }
 
     private fun httpGet() {
-        Fuel.get("/get", listOf("foo" to "foo", "bar" to "bar"))
-                .responseString { request, _, result ->
-                    Log.d(TAG, request.cUrlString())
-                    update(result)
-                }
-
-        "/get".httpGet().responseString { request, _, result ->
-            Log.d(TAG, request.toString())
-            update(result)
-        }
+        networkRepository.httpGet().update()
     }
 
     private fun httpPut() {
-        Fuel.put("/put", listOf("foo" to "foo", "bar" to "bar"))
-                .responseString { request, _, result ->
-                    Log.d(TAG, request.cUrlString())
-                    update(result)
-                }
-
-        "/put".httpPut(listOf("foo" to "foo", "bar" to "bar"))
-                .responseString { request, _, result ->
-                    Log.d(TAG, request.toString())
-                    update(result)
-                }
-
+        networkRepository.httpPut().update()
     }
 
     private fun httpPost() {
-        Fuel.post("/post", listOf("foo" to "foo", "bar" to "bar"))
-                .responseString { request, _, result ->
-                    Log.d(TAG, request.cUrlString())
-                    update(result)
-                }
-
-        "/post".httpPost(listOf("foo" to "foo", "bar" to "bar"))
-                .responseString { request, _, result ->
-                    Log.d(TAG, request.toString())
-                    update(result)
-                }
-
+        networkRepository.httpPost().update()
     }
 
     private fun httpDelete() {
-        Fuel.delete("/delete", listOf("foo" to "foo", "bar" to "bar"))
-                .responseString { request, _, result ->
-                    Log.d(TAG, request.cUrlString())
-                    update(result)
-                }
-
-        "/delete".httpDelete(listOf("foo" to "foo", "bar" to "bar"))
-                .responseString { request, _, result ->
-                    Log.d(TAG, request.toString())
-                    update(result)
-                }
-
+        networkRepository.httpDelete().update()
     }
 
     private fun httpDownload() {
-        val n = 100
-        Fuel.download("/bytes/${1024 * n}").destination { _, _ ->
-            File(filesDir, "test.tmp")
-        }.progress { readBytes, totalBytes ->
+        networkRepository.httpDownload { readBytes, totalBytes ->
             val progress = "$readBytes / $totalBytes"
             runOnUiThread {
                 mainAuxText.text = progress
             }
             Log.v(TAG, progress)
-        }.responseString { request, _, result ->
-            Log.d(TAG, request.toString())
-            update(result)
-        }
+        }.update()
     }
 
     private fun httpUpload() {
-        Fuel.upload("/post").source { _, _ ->
-            //create random file with some non-sense string
-            val file = File(filesDir, "out.tmp")
-            file.writer().use { writer ->
-                repeat(100) {
-                    writer.appendln("abcdefghijklmnopqrstuvwxyz")
-                }
-            }
-            file
-        }.progress { writtenBytes, totalBytes ->
+        networkRepository.httpUpload { writtenBytes, totalBytes ->
             Log.v(TAG, "Upload: ${writtenBytes.toFloat() / totalBytes.toFloat()}")
-        }.responseString { request, _, result ->
-            Log.d(TAG, request.toString())
-            update(result)
-        }
+        }.update()
     }
 
     private fun httpBasicAuthentication() {
-        val username = "U$3|2|\\|@me"
-        val password = "P@$\$vv0|2|)"
-        Fuel.get("/basic-auth/$username/$password").authenticate(username, password)
-                .responseString { request, _, result ->
-                    Log.d(TAG, request.toString())
-                    update(result)
-                }
-
-        "/basic-auth/$username/$password".httpGet().authenticate(username, password)
-                .responseString { request, _, result ->
-                    Log.d(TAG, request.toString())
-                    update(result)
-                }
+        networkRepository.httpBasicAuthentication("U$3|2|\\|@me", "P@$\$vv0|2|)").update()
     }
 
     private fun httpRxSupport() {
-        val disposable = "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
-                .rx_object(Issue.Deserializer())
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { result ->
-                    Log.d(TAG, result.toString())
-                }
+        val disposable = networkRepository.httpRxSupport().subscribe { result ->
+            result.update()
+        }
         bag.add(disposable)
     }
 
@@ -242,29 +147,12 @@ class MainActivity : AppCompatActivity(),MainActivityContract.View {
                 }
     }
 
-    override fun <T : Any> update(result: Result<T, FuelError>) {
-        result.fold(success = {
+    override fun <T : Any> Result<T, FuelError>.update() {
+        this.fold(success = {
             mainResultText.append(it.toString())
         }, failure = {
             mainResultText.append(String(it.errorData))
         })
-    }
-
-    data class Issue(
-            val id: Int = 0,
-            val title: String = "",
-            val url: String = ""
-    ) {
-        class Deserializer : ResponseDeserializable<Issue> {
-            override fun deserialize(reader: Reader) = Gson().fromJson(reader, Issue::class.java)
-        }
-
-        class ListDeserializer : ResponseDeserializable<List<Issue>> {
-            override fun deserialize(reader: Reader): List<Issue> {
-                val type = object : TypeToken<List<Issue>>() {}.type
-                return Gson().fromJson(reader, type)
-            }
-        }
     }
 
 }

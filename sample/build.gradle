@@ -45,6 +45,9 @@ dependencies {
     api project(':fuel-gson')
     api project(':fuel-coroutines')
 
+    testCompile "junit:junit:$junitVersion"
+    testCompile "org.robolectric:robolectric:$robolectricVersion"
+
     androidTestImplementation "com.android.support:support-annotations:$androidSupportVersion"
     androidTestImplementation "com.android.support.test:runner:$runnerVersion"
     androidTestImplementation "com.android.support.test:rules:$rulesVersion"

@@ -6,7 +6,7 @@ import com.github.kittinunf.result.Result
 interface MainActivityContract {
 
     interface View {
-       fun <T : Any> update(result: Result<T, FuelError>)
+       fun <T : Any> Result<T, FuelError>.update()
        fun clearText()
     }
 
