@@ -12,7 +12,6 @@ interface NetworkRepository {
     fun httpResponseObject(): Result<Issue, FuelError>
     fun httpListResponseObject(): Result<List<Issue>, FuelError>
     fun httpGsonResponseObject(): Result<Issue, FuelError>
-
     fun httpGetRequest(): Request
     fun httpGet(): Result<String, FuelError>
     fun httpPut(): Result<String, FuelError>

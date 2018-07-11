@@ -35,7 +35,6 @@ class MainActivity : AppCompatActivity(), MainActivityContract.View {
     override fun onDestroy() {
         super.onDestroy()
         presenter.onFinish()
-
     }
 
     override fun clearText() {
