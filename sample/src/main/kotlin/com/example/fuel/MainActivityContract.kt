@@ -6,16 +6,15 @@ import com.github.kittinunf.result.Result
 interface MainActivityContract {
 
     interface View {
-       fun <T : Any> Result<T, FuelError>.update()
-       fun clearText()
+        fun <T : Any> update(result: Result<T, FuelError>)
+        fun clearText()
+        fun appendToMainText(text: String)
     }
 
-    interface Presenter{
-        fun onStart(view:View)
+    interface Presenter : NetworkRepository {
+        fun onStart(view: View)
         fun onFinish()
         fun resetText()
-        suspend fun httpGetCoroutine()
-
-
+        fun executeAll()
     }
 }
