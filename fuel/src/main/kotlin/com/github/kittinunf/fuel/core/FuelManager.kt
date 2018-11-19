@@ -80,10 +80,10 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
      */
     override fun request(method: Method, path: String, parameters: Parameters?): Request {
         val request = request(Encoding(
-                httpMethod = method,
-                urlString = path,
-                baseUrlString = basePath,
-                parameters = if (parameters == null) baseParams else baseParams + parameters
+            httpMethod = method,
+            urlString = path,
+            baseUrlString = basePath,
+            parameters = if (parameters == null) baseParams else baseParams + parameters
         ).request)
         return applyOptions(request)
     }
@@ -101,7 +101,7 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
      * @return [Request] the request
      */
     override fun request(method: Method, convertible: PathStringConvertible, parameters: Parameters?): Request =
-            request(method, convertible.path, parameters)
+        request(method, convertible.path, parameters)
 
     /**
      * Make a request using from [convertible]
@@ -121,10 +121,10 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
      */
     override fun download(path: String, method: Method, parameters: Parameters?): DownloadRequest {
         val request = Encoding(
-                httpMethod = method,
-                urlString = path,
-                baseUrlString = basePath,
-                parameters = if (parameters == null) baseParams else baseParams + parameters
+            httpMethod = method,
+            urlString = path,
+            baseUrlString = basePath,
+            parameters = if (parameters == null) baseParams else baseParams + parameters
         ).request
         return applyOptions(request).download()
     }
@@ -139,10 +139,10 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
      */
     override fun upload(path: String, method: Method, parameters: Parameters?): UploadRequest {
         val request = Encoding(
-                httpMethod = method,
-                urlString = path,
-                baseUrlString = basePath,
-                parameters = if (parameters == null) baseParams else baseParams + parameters
+            httpMethod = method,
+            urlString = path,
+            baseUrlString = basePath,
+            parameters = if (parameters == null) baseParams else baseParams + parameters
         ).request
         return applyOptions(request).upload()
     }
@@ -185,13 +185,13 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
 
         return request.header(unsetBaseHeaders).apply {
             executionOptions = RequestExecutionOptions(
-                    client = client,
-                    socketFactory = socketFactory,
-                    hostnameVerifier = hostnameVerifier,
-                    callbackExecutor = callbackExecutor,
-                    requestTransformer = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) },
-                    responseTransformer = responseInterceptors.foldRight({ _: Request, res: Response -> res }) { f, acc -> f(acc) },
-                    executorService = executorService
+                client = client,
+                socketFactory = socketFactory,
+                hostnameVerifier = hostnameVerifier,
+                callbackExecutor = callbackExecutor,
+                requestTransformer = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) },
+                responseTransformer = responseInterceptors.foldRight({ _: Request, res: Response -> res }) { f, acc -> f(acc) },
+                executorService = executorService
             ).also { executor ->
                 executor.timeoutInMillisecond = timeoutInMillisecond
                 executor.timeoutReadInMillisecond = timeoutReadInMillisecond
@@ -213,14 +213,14 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
      * @return [Request] the request
      */
     override fun get(path: String, parameters: Parameters?): Request =
-            request(Method.GET, path, parameters?.flatMap { pair ->
-                // TODO: move to generic url encoding
-                (pair.second as? Iterable<*>)?.map {
-                    "${pair.first}[]" to it
-                }?.toList() ?: (pair.second as? Array<*>)?.map {
-                    "${pair.first}[]" to it
-                }?.toList() ?: listOf(pair)
-            })
+        request(Method.GET, path, parameters?.flatMap { pair ->
+            // TODO: move to generic url encoding
+            (pair.second as? Iterable<*>)?.map {
+                "${pair.first}[]" to it
+            }?.toList() ?: (pair.second as? Array<*>)?.map {
+                "${pair.first}[]" to it
+            }?.toList() ?: listOf(pair)
+        })
 
     /**
      * Create a [Method.GET] [Request] to [PathStringConvertible.path] with [parameters]
@@ -230,7 +230,7 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
      * @return [Request] the request
      */
     override fun get(convertible: PathStringConvertible, parameters: Parameters?): Request =
-            request(Method.GET, convertible, parameters)
+        request(Method.GET, convertible, parameters)
 
     /**
      * Create a [Method.POST] [Request] to [path] with [parameters]
@@ -240,7 +240,7 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
      * @return [Request] the request
      */
     override fun post(path: String, parameters: Parameters?): Request =
-            request(Method.POST, path, parameters)
+        request(Method.POST, path, parameters)
 
     /**
      * Create a [Method.POST] [Request] to [PathStringConvertible.path] with [parameters]
@@ -250,7 +250,7 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
      * @return [Request] the request
      */
     override fun post(convertible: PathStringConvertible, parameters: Parameters?): Request =
-            request(Method.POST, convertible, parameters)
+        request(Method.POST, convertible, parameters)
 
     /**
      * Create a [Method.PUT] [Request] to [path] with [parameters]
@@ -260,7 +260,7 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
      * @return [Request] the request
      */
     override fun put(path: String, parameters: Parameters?): Request =
-            request(Method.PUT, path, parameters)
+        request(Method.PUT, path, parameters)
 
     /**
      * Create a [Method.PUT] [Request] to [PathStringConvertible.path] with [parameters]
@@ -270,7 +270,7 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
      * @return [Request] the request
      */
     override fun put(convertible: PathStringConvertible, parameters: Parameters?): Request =
-            request(Method.PUT, convertible, parameters)
+        request(Method.PUT, convertible, parameters)
 
     /**
      * Create a [Method.PATCH] [Request] to [path] with [parameters]
@@ -280,7 +280,7 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
      * @return [Request] the request
      */
     override fun patch(path: String, parameters: Parameters?): Request =
-            request(Method.PATCH, path, parameters)
+        request(Method.PATCH, path, parameters)
 
     /**
      * Create a [Method.PATCH] [Request] to [PathStringConvertible.path] with [parameters]
@@ -290,7 +290,7 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
      * @return [Request] the request
      */
     override fun patch(convertible: PathStringConvertible, parameters: Parameters?): Request =
-            request(Method.PATCH, convertible, parameters)
+        request(Method.PATCH, convertible, parameters)
 
     /**
      * Create a [Method.DELETE] [Request] to [path] with [parameters]
@@ -300,7 +300,7 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
      * @return [Request] the request
      */
     override fun delete(path: String, parameters: Parameters?): Request =
-            request(Method.DELETE, path, parameters)
+        request(Method.DELETE, path, parameters)
 
     /**
      * Create a [Method.DELETE] [Request] to [PathStringConvertible.path] with [parameters]
@@ -310,7 +310,7 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
      * @return [Request] the request
      */
     override fun delete(convertible: PathStringConvertible, parameters: Parameters?): Request =
-            request(Method.DELETE, convertible, parameters)
+        request(Method.DELETE, convertible, parameters)
 
     /**
      * Create a [method] [Request] to [PathStringConvertible.path] with [parameters], which can download to a file
@@ -321,7 +321,7 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
      * @return [DownloadRequest] the request (extended for download)
      */
     override fun download(convertible: PathStringConvertible, method: Method, parameters: Parameters?): DownloadRequest =
-            download(convertible.path, method, parameters)
+        download(convertible.path, method, parameters)
 
     /**
      * Create a [method] [Request] to [PathStringConvertible.path] with [parameters], which can upload blobs and
@@ -333,7 +333,7 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
      * @return [UploadRequest] the request (extended for upload)
      */
     override fun upload(convertible: PathStringConvertible, method: Method, parameters: Parameters?): UploadRequest =
-            upload(convertible.path, method, parameters)
+        upload(convertible.path, method, parameters)
 
     /**
      * Create a [Method.HEAD] [Request] to [path] with [parameters]
@@ -343,7 +343,7 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
      * @return [Request] the request
      */
     override fun head(path: String, parameters: Parameters?): Request =
-            request(Method.HEAD, path, parameters)
+        request(Method.HEAD, path, parameters)
 
     /**
      * Create a [Method.HEAD] [Request] to [PathStringConvertible.path] with [parameters]
@@ -353,7 +353,7 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
      * @return [Request] the request
      */
     override fun head(convertible: PathStringConvertible, parameters: Parameters?): Request =
-            request(Method.HEAD, convertible, parameters)
+        request(Method.HEAD, convertible, parameters)
 
     /**
      * Resets this FuelManager to a clean instance
